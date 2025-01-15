@@ -48,7 +48,7 @@ const Dashboard = () => {
           },
         }} 
       contentLabel=""
-      className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 border overflow-scroll"
+      className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-14 p-5 border"
       >
         <AddEditNotes/>
       </Modal>
