@@ -40,7 +40,7 @@ const AddEditNotes = () => {
         />
       </div>
 
-      <button className='btn-primary font-medium mt-5 p-3' onClick={()=> {}}>
+      <button className='btn-primary rounded-full font-medium mt-5 p-3' onClick={()=> {}}>
         Add
       </button>
     </div>
