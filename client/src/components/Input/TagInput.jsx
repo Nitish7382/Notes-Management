@@ -42,6 +42,7 @@ const TagInput = ({ tags, setTags }) => {
       <div className="flex items-center gap-3 mt-3">
         <input
           type="text"
+          value={inputValue}
           className="text-sm bg-transparent border px-3 py-2 rounded-3xl outline-none"
           placeholder="Add Tags"
           onChange={handleInputChange}
