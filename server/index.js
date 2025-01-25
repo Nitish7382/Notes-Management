@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const config = require("./config.json");
 const mongoose = require("mongoose");
 
@@ -16,60 +17,98 @@ const { authenticationToken } = require("./utilities");
 app.use(express.json());
 
 app.use(
-    cors({
-        origin: "*",
-    })
+  cors({
+    origin: "*",
+  })
 );
 
 app.get("/", (req, res) => {
-    res.json({ data: "hello" });
+  res.json({ data: "hello" });
 });
 
 // Create Account
 app.post("/create-account", async (req, res) => {
-    const { fullName, email, password } = req.body;
+  const { fullName, email, password } = req.body;
 
-    if (!fullName) {
-        return res
-            .status(400)
-            .json({ error: true, message: "Full Name is Required" });
-    }
+  if (!fullName) {
+    return res
+      .status(400)
+      .json({ error: true, message: "Full Name is Required" });
+  }
+  if (!email) {
+    return res.status(400).json({ error: true, message: "Email is Required" });
+  }
+  if (!password) {
+    return res
+      .status(400)
+      .json({ error: true, message: "Password Name is Required" });
+  }
+  const isUser = await User.findOne({ email: email });
 
-    if (!email) {
-        return res.status(400).json({ error: true, message: "Email is Required" });
-    }
+  if (isUser) {
+    return res.json({ error: true, message: "User Already exist" });
+  }
 
-    if (!password) {
-        return res
-            .status(400)
-            .json({ error: true, message: "Password Name is Required" });
-    }
+  const user = new User({
+    fullName,
+    email,
+    password,
+  });
 
-    const isUser = await User.findOne({email: email,});
+  await user.save();
 
-    if (isUser){
-        return res.json({
-            error:true,
-            message:"User Already exist"
-        })
-    }
+  const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: "36000m",
+  });
 
-    const user = new User({
-        fullName,
-        email,
-        password
+  return res.json({
+    error: false,
+    user,
+    accessToken,
+    message: "Registration Sucessfull",
+  });
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email) {
+    return res.status(400).json({
+      message: "Email is required",
     });
+  }
 
-    await user.save();
+  if (!password) {
+    return res.status(400).json({
+      message: "Password is required",
+    });
+  }
 
-    const accessToken = jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET , {expiresIn:"36000m",});
+  const userInfo = await User.findOne({ email: email });
+
+  if (!userInfo) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  if (userInfo.email == email && userInfo.password == password) {
+    const user = { user: userInfo };
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "36000m",
+    });
     return res.json({
-        error:false,
-        user,
-        accessToken,
-        message:"Registration Sucessfull"
+      error: false,
+      message: "Login Successful",
+      email,
+      accessToken,
     });
+  } else{
+    return res.status(400).json({
+        error:true,
+        message:"Invalid credentials",
+    });
+  }
 });
 
 app.listen(8000);
+console.log("Server is running on port 8000");
 module.exports = app;
