@@ -152,6 +152,65 @@ app.post("/add-note",authenticationToken, async(req,res)=>{
 
 });
 
+//Edit-note
+app.put("/edit-note/:noteId",authenticationToken, async(req,res)=>{
+  const noteId = req.params.noteId;
+  const {title,content,tags,isPinned} = req.body;
+  const {user} = req.user;
+
+  if(!title && !content && !tags){
+    return res.status(400).json({error:true, messege:"No changes provided"});
+  }
+
+  try {
+    const note = await Note.findOne({_id:noteId, userId:user._id});
+
+    if(!note){
+      return res.status(404).json({error:true,messege:"Note not found"});
+    }
+
+    if(title) note.title = title;
+    if (content) note.content = content;
+    if (tags) note.tags = tags;
+    if (isPinned) note.isPinned = isPinned;
+
+    await note.save();
+
+    return res.json({
+      error:false,
+      note,
+      messege:"Note updated Successfully"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      error:true,
+      messege:"Internal server Error"
+    });
+  }
+
+});
+
+//Get-All-notes
+app.get("/get-all-notes",authenticationToken, async(req,res)=>{
+  const {user} = req.user;
+  try {
+    const notes = await Note.find({userId:user._id}).sort({isPinned:-1});
+
+    return res.json({
+      error:false,
+      notes,
+      messege:"All notes retrieved successfully"
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      error:true,
+      messege:"Internal Server Error"
+    })
+  }
+});
+
 app.listen(8000);
 console.log("Server is running on port 8000");
 module.exports = app;
