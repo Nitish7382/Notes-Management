@@ -6,6 +6,7 @@ import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosinstance";
+import moment from "moment";
 
 const Dashboard = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -15,6 +16,7 @@ const Dashboard = () => {
   });
 
   const [userInfo, setUserInfo] = useState(null);
+  const [allNotes, setAllNotes] = useState([])
 
   const navigate = useNavigate();
 
@@ -33,7 +35,20 @@ const Dashboard = () => {
     }
   };
 
+  //Get all Notes
+  const getAllNotes =async () =>{
+    try {
+      const response =await axiosInstance.get("/get-all-notes");
+      if (response.data && response.data.notes) {
+        setAllNotes(response.data.notes)
+      }
+    } catch (error) {
+      console.log("An unexpected error")
+    }
+  }
+
   useEffect(() => {
+    getAllNotes();
     getUserInfo();
   }, []);
 
@@ -42,16 +57,20 @@ const Dashboard = () => {
       <NavBar userInfo = {userInfo} />
       <div className="container mx-auto px-4 py-4">
         <div className="grid grid-cols-3 gap-4">
+
+        {allNotes.map((item,index)=>(
           <NoteCard
-            title="Note Title"
-            date="12/12/2021"
-            content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla nec purus feugiat"
-            tags="#meetings"
-            isPinned={true}
-            onEdit={() => {}}
-            onDelete={() => {}}
-            OnPinNote={() => {}}
-          />
+          key={item._id}
+          title={item.title}
+          date={item.createdOn}
+          content={item.content}
+          tags={item.tags}
+          isPinned={item.isPinned}
+          onEdit={() => {}}
+          onDelete={() => {}}
+          OnPinNote={() => {}}
+        />
+        ))}
         </div>
       </div>
 
@@ -81,6 +100,7 @@ const Dashboard = () => {
           handleClose={() => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}
+          getAllNotes = {getAllNotes}
         />
       </Modal>
     </>
