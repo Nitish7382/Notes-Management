@@ -6,8 +6,10 @@ import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosinstance";
-import {toast, Bounce, ToastContainer } from "react-toastify";
+import { toast, Bounce, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Emptycard from "../../components/Empty Card/Emptycard";
+import AddNoteSvg from "../../assets/Empty.svg";
 
 const Dashboard = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -53,7 +55,7 @@ const Dashboard = () => {
 
   //Delete Note
   const deletenote = async (data) => {
-    const noteId = data._id
+    const noteId = data._id;
 
     try {
       const response = await axiosInstance.delete(`/delete-note/${noteId}`);
@@ -61,14 +63,14 @@ const Dashboard = () => {
       if (response.data && !response.data.error) {
         getAllNotes();
         toast.warning("Note deleted successfully!");
-        
       }
     } catch (error) {
-      const errorMessage = error.response?.data?.messege || "Something went wrong!";
+      const errorMessage =
+        error.response?.data?.messege || "Something went wrong!";
       setError(errorMessage);
       toast.error(errorMessage);
     }
-  }
+  };
 
   useEffect(() => {
     getAllNotes();
@@ -79,21 +81,29 @@ const Dashboard = () => {
     <>
       <NavBar userInfo={userInfo} />
       <div className="container mx-auto px-4 py-4">
-        <div className="grid grid-cols-3 gap-4">
-          {allNotes.map((item, index) => (
-            <NoteCard
-              key={item._id}
-              title={item.title}
-              date={item.createdOn}
-              content={item.content}
-              tags={item.tags}
-              isPinned={item.isPinned}
-              onEdit={() => handleEdit(item)}
-              onDelete={() => deletenote(item)}
-              OnPinNote={() => {}}
-            />
-          ))}
-        </div>
+        {allNotes.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4">
+            {allNotes.map((item, index) => (
+              <NoteCard
+                key={item._id}
+                title={item.title}
+                date={item.createdOn}
+                content={item.content}
+                tags={item.tags}
+                isPinned={item.isPinned}
+                onEdit={() => handleEdit(item)}
+                onDelete={() => deletenote(item)}
+                OnPinNote={() => {}}
+              />
+            ))}
+          </div>
+        ) : (
+          <Emptycard
+            imgSrc={AddNoteSvg}
+            messege="Start creating your First note! Click the 'Add' button to write your 
+            thoughts, ideas, reminders. Let get Started"
+          />
+        )}
       </div>
 
       <button
