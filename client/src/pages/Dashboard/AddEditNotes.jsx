@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import TagInput from "../../components/Input/TagInput";
 import { MdClose } from "react-icons/md";
 import axiosInstance from "../../utils/axiosinstance";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AddEditNotes = ({ noteData, type, getAllNotes, handleClose }) => {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [tags, setTags] = useState([]);
+  const [title, setTitle] = useState(noteData?.title || "");
+  const [content, setContent] = useState(noteData?.content || "");
+  const [tags, setTags] = useState(noteData?.tags || []);
   const [error, setError] = useState(null);
 
-//Add Note 
-  const addNewNote = async()=>{
+  // Add Note 
+  const addNewNote = async () => {
     try {
-      const response = await axiosInstance.post("/add-note" , {
+      const response = await axiosInstance.post("/add-note", {
         title,
         content,
         tags,
@@ -20,33 +22,55 @@ const AddEditNotes = ({ noteData, type, getAllNotes, handleClose }) => {
 
       if (response.data && response.data.note) {
         getAllNotes();
-        onclose();
+        toast.success("Note added successfully!");
+        handleClose();  // Fix: Was incorrectly written as onclose()
       }
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.messege) {
-        setError(error.response.data.messege)
-      }
+      const errorMessage = error.response?.data?.messege || "Something went wrong!";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   // Edit Note
-  const editNote = async()=>{};
+  const editNote = async () => {
+    const noteId = noteData._id;
+    try {
+      const response = await axiosInstance.put(`/edit-note/${noteId}`, {
+        title,
+        content,
+        tags,
+      });
+
+      if (response.data && response.data.note) {
+        getAllNotes();
+        toast.success("Note updated successfully!");
+        handleClose();  // Fix: Was incorrectly written as onclose()
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.messege || "Something went wrong!";
+      setError(errorMessage);
+      toast.error(errorMessage);
+    }
+  };
 
   const handleAddNote = () => {
     if (!title) {
       setError("Please Enter The Title");
+      toast.error("Please Enter The Title");
       return;
     }
     if (!content) {
-      setError("Please Enter The content");
+      setError("Please Enter The Content");
+      toast.error("Please Enter The Content");
       return;
     }
-    setError("");
+    setError(null);
 
     if (type === "edit") {
-      editNote()
-    }else{
-      addNewNote()
+      editNote();
+    } else {
+      addNewNote();
     }
   };
 
@@ -63,12 +87,10 @@ const AddEditNotes = ({ noteData, type, getAllNotes, handleClose }) => {
         <label className="input-label">Title</label>
         <input
           type="text"
-          className="text-2xl text-slate-950 bg-slate-50 rounded-lg p-1 outline-none "
+          className="text-2xl text-slate-950 bg-slate-50 rounded-lg p-1 outline-none"
           placeholder="Go to Read the Book"
           value={title}
-          onChange={({ target }) => {
-            setTitle(target.value);
-          }}
+          onChange={({ target }) => setTitle(target.value)}
         />
       </div>
 
@@ -80,9 +102,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, handleClose }) => {
           placeholder="Write your content Here"
           rows={10}
           value={content}
-          onChange={({ target }) => {
-            setContent(target.value);
-          }}
+          onChange={({ target }) => setContent(target.value)}
         />
       </div>
 
@@ -97,7 +117,7 @@ const AddEditNotes = ({ noteData, type, getAllNotes, handleClose }) => {
         className="btn-primary rounded-full font-medium mt-5 p-3"
         onClick={handleAddNote}
       >
-        Add
+        {type === "edit" ? "UPDATE" : "ADD"}
       </button>
     </div>
   );

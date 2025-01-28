@@ -1,4 +1,4 @@
-import React, { useState,useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import NavBar from "../../components/Navbar/NavBar";
 import NoteCard from "../../components/cards/NoteCard";
 import { MdAdd } from "react-icons/md";
@@ -6,7 +6,8 @@ import AddEditNotes from "./AddEditNotes";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosinstance";
-import moment from "moment";
+import {toast, Bounce, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Dashboard = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
@@ -16,11 +17,14 @@ const Dashboard = () => {
   });
 
   const [userInfo, setUserInfo] = useState(null);
-  const [allNotes, setAllNotes] = useState([])
+  const [allNotes, setAllNotes] = useState([]);
 
   const navigate = useNavigate();
+  const handleEdit = (noteDetails) => {
+    setOpenAddEditModal({ isShown: true, data: noteDetails, type: "edit" });
+  };
 
-  //Get-UserInfo
+  // Get User Info
   const getUserInfo = async () => {
     try {
       const response = await axiosInstance.get("/get-user");
@@ -35,15 +39,34 @@ const Dashboard = () => {
     }
   };
 
-  //Get all Notes
-  const getAllNotes =async () =>{
+  // Get all Notes
+  const getAllNotes = async () => {
     try {
-      const response =await axiosInstance.get("/get-all-notes");
+      const response = await axiosInstance.get("/get-all-notes");
       if (response.data && response.data.notes) {
-        setAllNotes(response.data.notes)
+        setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log("An unexpected error")
+      console.log("An unexpected error");
+    }
+  };
+
+  //Delete Note
+  const deletenote = async (data) => {
+    const noteId = data._id
+
+    try {
+      const response = await axiosInstance.delete(`/delete-note/${noteId}`);
+
+      if (response.data && !response.data.error) {
+        getAllNotes();
+        toast.warning("Note deleted successfully!");
+        
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.messege || "Something went wrong!";
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   }
 
@@ -54,33 +77,32 @@ const Dashboard = () => {
 
   return (
     <>
-      <NavBar userInfo = {userInfo} />
+      <NavBar userInfo={userInfo} />
       <div className="container mx-auto px-4 py-4">
         <div className="grid grid-cols-3 gap-4">
-
-        {allNotes.map((item,index)=>(
-          <NoteCard
-          key={item._id}
-          title={item.title}
-          date={item.createdOn}
-          content={item.content}
-          tags={item.tags}
-          isPinned={item.isPinned}
-          onEdit={() => {}}
-          onDelete={() => {}}
-          OnPinNote={() => {}}
-        />
-        ))}
+          {allNotes.map((item, index) => (
+            <NoteCard
+              key={item._id}
+              title={item.title}
+              date={item.createdOn}
+              content={item.content}
+              tags={item.tags}
+              isPinned={item.isPinned}
+              onEdit={() => handleEdit(item)}
+              onDelete={() => deletenote(item)}
+              OnPinNote={() => {}}
+            />
+          ))}
         </div>
       </div>
 
-      <button className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10">
-        <MdAdd
-          className="text-[32px] h-10 w-10 text-white"
-          onClick={() => {
-            setOpenAddEditModal({ isShown: true, type: "add", data: null });
-          }}
-        />
+      <button
+        className="w-16 h-16 flex items-center justify-center rounded-2xl bg-primary hover:bg-blue-600 absolute right-10 bottom-10"
+        onClick={() => {
+          setOpenAddEditModal({ isShown: true, type: "add", data: null });
+        }}
+      >
+        <MdAdd className="text-[32px] h-10 w-10 text-white" />
       </button>
 
       <Modal
@@ -100,9 +122,24 @@ const Dashboard = () => {
           handleClose={() => {
             setOpenAddEditModal({ isShown: false, type: "add", data: null });
           }}
-          getAllNotes = {getAllNotes}
+          getAllNotes={getAllNotes}
         />
       </Modal>
+
+      {/* Toast Notifications */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        transition={Bounce}
+      />
     </>
   );
 };
