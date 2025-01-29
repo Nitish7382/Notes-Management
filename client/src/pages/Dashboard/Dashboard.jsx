@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Emptycard from "../../components/Empty Card/Emptycard";
 import AddNoteSvg from "../../assets/Empty.svg";
 
+
 const Dashboard = () => {
   const [openAddEditModal, setOpenAddEditModal] = useState({
     isShown: false,
@@ -18,8 +19,10 @@ const Dashboard = () => {
     data: null,
   });
 
-  const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
+
+  const [isSearch,setIsSearch] = useState(false);
 
   const navigate = useNavigate();
   const handleEdit = (noteDetails) => {
@@ -72,6 +75,22 @@ const Dashboard = () => {
     }
   };
 
+  //Search for a note
+  const  onSearchNote = async (query) => {
+    try {
+      const response = await axiosInstance.get("/search-notes",{
+        params:{query},
+      });
+
+      if (response.data && response.data.notes) {
+        setIsSearch(true);
+        setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   useEffect(() => {
     getAllNotes();
     getUserInfo();
@@ -79,7 +98,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <NavBar userInfo={userInfo} />
+      <NavBar userInfo={userInfo} onSearchNote={onSearchNote} />
       <div className="container mx-auto px-4 py-4">
         {allNotes.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">
