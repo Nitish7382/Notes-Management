@@ -87,9 +87,14 @@ const Dashboard = () => {
         setAllNotes(response.data.notes);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error) 
     }
   }
+
+  const handleClearSearch = () => {
+    setIsSearch(false);
+    getAllNotes();
+  } 
 
   useEffect(() => {
     getAllNotes();
@@ -98,7 +103,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <NavBar userInfo={userInfo} onSearchNote={onSearchNote} />
+      <NavBar userInfo={userInfo} onSearchNote={onSearchNote} handleClearSearch={handleClearSearch} />
       <div className="container mx-auto px-4 py-4">
         {allNotes.length > 0 ? (
           <div className="grid grid-cols-3 gap-4">

@@ -298,7 +298,7 @@ app.get("/search-notes/",authenticationToken,async (req,res) => {
   const {query} = req.query;
 
   if (!query) {
-    res.status(400).json({error:true,message:"Search query is required"})
+    return res.status(400).json({error:true,message:"Search query is required"})
   }
 
   try {
