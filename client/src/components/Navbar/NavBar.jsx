@@ -9,7 +9,7 @@ const NavBar = ({userInfo, onSearchNote, handleClearSearch}) => {
 
   const navigate = useNavigate();
   const handlelogout = () => {
-    navigate("/Login");
+    navigate("/login");
   };
 
   const handleSearch = () => {
