@@ -2,6 +2,8 @@ import React,{useState} from "react";
 import { useNavigate } from "react-router-dom";
 import ProfileInfo from "../cards/ProfileInfo";
 import SearchBar from "../SearchBar/SearchBar";
+import { FaStickyNote } from "react-icons/fa";
+
 
 const NavBar = ({userInfo, onSearchNote, handleClearSearch}) => {
 
@@ -26,7 +28,9 @@ const NavBar = ({userInfo, onSearchNote, handleClearSearch}) => {
 
   return (
     <div className=" bg-white flex items-center justify-between px-6 py-4 drop-shadow-md">
-      <h2 className=" text-xl font-medium text-black py-2">Notes Management</h2>
+     <h5 className="text-3xl font-bold text-blue-700 flex items-center">
+               <FaStickyNote className="mr-3 text-blue-600" /> NoteNexus
+             </h5>
 
       <SearchBar 
       value={searchQuery}
