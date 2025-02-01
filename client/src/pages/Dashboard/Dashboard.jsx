@@ -165,7 +165,7 @@ const Dashboard = () => {
         onRequestClose={() => {}}
         style={{
           overlay: {
-            backgroundcolor: "rgba(0,0,0,0.2)",
+            backgroundcolor: "rgba(0,0,0,0.5)",
           },
         }}
         contentLabel=""

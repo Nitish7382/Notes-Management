@@ -13,7 +13,7 @@ const NoteCard = ({
   OnPinNote,
 }) => {
   return (
-    <div className="border rounded bg-white p-4 hover:shadow-xl transition-all ease-in-out">
+    <div className="border rounded-xl bg-white p-4 hover:shadow-xl transition-all ease-in-out">
       <div className="">
         <div className="flex items-center justify-between">
           <h6 className="text-sm font-medium">{title}</h6>
@@ -27,12 +27,17 @@ const NoteCard = ({
         <span className="text-xs text-slate-500">{moment().format('Do MMM YYYY')}</span>
       </div>
 
-      <p className="text-xs text-slate-600 mt-2">{content?.slice(0, 60)}</p>
+      <p className="text-xs text-slate-600 mt-2 cursor-pointer">{content?.slice(0, 60)}</p>
 
       <div className="flex items-center justify-between">
-        <div className="text-xs text-slate-700 bg-slate-200 border rounded-full p-2 mt-1">
-          {tags.map((item)=>`#${item}`)}
-        </div>
+        <div className="flex gap-2">
+          {tags.map((item)=>(
+            <div className="text-xs text-slate-700 bg-slate-200 border rounded-full p-[6px] mt-1">
+              # {item}
+            </div>
+          ))}
+          </div>
+        
 
         <div className="flex items-center gap-2">
           <MdCreate
