@@ -14,6 +14,10 @@ const NavBar = ({userInfo, onSearchNote, handleClearSearch}) => {
     navigate("/login");
   };
 
+  const handlehome = ()=>{
+    navigate("/")
+  }
+
   const handleSearch = () => {
    if (searchQuery) {
     onSearchNote(searchQuery)
@@ -27,24 +31,31 @@ const NavBar = ({userInfo, onSearchNote, handleClearSearch}) => {
   };
 
   return (
-    <div className=" bg-white flex items-center justify-between px-6 py-4 drop-shadow-md">
-     <h5 className="text-3xl font-bold text-blue-700 flex items-center">
-               <FaStickyNote className="mr-3 text-blue-600" /> NoteNexus
-             </h5>
-
-      <SearchBar 
-      value={searchQuery}
-      onChange={({target})=>{
-        setSearchQuery(target.value);
-      }} 
-
-      handleSearch={handleSearch}
-      onClearSearch={onClearSearch}      
-      />
-
-      <ProfileInfo userInfo={userInfo} OnLogout={handlelogout} />
+    <div className="bg-white flex items-center justify-between px-6 py-4 drop-shadow-md">
+      {/* Left Section - Logo */}
+      <div className="flex items-center">
+        <h5 onClick={handlehome} className="text-3xl font-bold text-blue-700 flex items-center cursor-pointer">
+          <FaStickyNote className="mr-3 text-blue-600" /> NoteNexus
+        </h5>
+      </div>
+  
+      {/* Center Section - Search Bar */}
+      <div className="flex-1 flex justify-center">
+        <SearchBar
+          value={searchQuery}
+          onChange={({ target }) => setSearchQuery(target.value)}
+          handleSearch={handleSearch}
+          onClearSearch={onClearSearch}
+        />
+      </div>
+  
+      {/* Right Section - Profile Info */}
+      <div className="flex items-center">
+        <ProfileInfo userInfo={userInfo} OnLogout={handlelogout} />
+      </div>
     </div>
   );
+  
 };
 
 export default NavBar;
